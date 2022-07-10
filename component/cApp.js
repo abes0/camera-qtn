@@ -1,13 +1,19 @@
 import * as THREE from "three";
-import PThree from '../parent/pThree'
+import PThree, {LCamera} from '../parent/pThree'
 export default class CApp extends PThree {
   constructor() {
-    super({wrapper: '#app', isFitScreen: true})
+    super({wrapper: '#app', isFitScreen: false})
+  }
+
+  setParam() {
+    this.param.camera.x = 5
+    this.param.camera.z = 100
+    this.param.camera.far = 200
+    this.param.camera.near = 20
   }
 
   init() {
-    this.addControls()
-    this.mesh01 = this.initMesh({size: 60.0, face: 2.0, pos: {x: 0, y:0, z:0}});
+    this.mesh = this.initMesh({size: 10.0, face: 2.0, pos: {x: 0, y:0, z: 0}});
     this.now = {
       x: 0,
       y: 0,
@@ -16,20 +22,26 @@ export default class CApp extends PThree {
 
     this.defaultCamPos = this.camera.position.clone()
     this.defaultCamDis = new THREE.Vector3().distanceTo(this.defaultCamPos)
-    // for Debug
-    this.mesh02Pos = new THREE.Vector3(this.defaultCamPos.x / 10, this.defaultCamPos.y / 10, this.defaultCamPos.z / 10)
-    this.mesh02Dis = new THREE.Vector3().distanceTo(this.mesh02Pos)
-    this.mesh02 = this.initMesh({size: 10.0, face: 2.0, pos: {x: 0, y:this.mesh02Pos.y, z:this.mesh02Pos.x}});
-    
 
-    const d1 = Math.sqrt(this.defaultCamPos.x * this.defaultCamPos.x + this.defaultCamPos.y * this.defaultCamPos.y + this.defaultCamPos.z * this.defaultCamPos.z)
-    // console.log(this.defaultCamDis, d1);
+    // second camera
+    const _cameraParam = Object.assign(this.param.camera)
+    _cameraParam.far = 400
+    _cameraParam.z = 200
+    this._camera = new LCamera({param: _cameraParam }).get()
 
+    // helpers
+    // this.addControls(this.camera)
+    this.addCameraHelper(this.camera)
+
+    this.cameraHelper = new THREE.CameraHelper(this.camera)
+    this.cameraHelper.setColors(new THREE.Color(0xff0000), new THREE.Color(0x00ff00), new THREE.Color(0x0000ff), new THREE.Color(0xff00ff), new THREE.Color(0x00ffff))
+    this.scene.add(this.cameraHelper)
   }
 
   initMesh(option = {}) {
     const {size, face, pos} = option
-    const geo = new THREE.BoxGeometry(size, size, size)
+    // const geo = new THREE.BoxGeometry(size, size, size)
+    const geo = new THREE.ConeGeometry(size, size, 32)
     const mat = new THREE.MeshNormalMaterial({
       // color: 0xaabbee,
       // emissive: 0x072534,
@@ -48,7 +60,6 @@ export default class CApp extends PThree {
     this.now.x += (this.mouse.x - this.now.x) * this.ease;
     this.now.y += (this.mouse.y - this.now.y) * this.ease;
 
-    const camPos = this.defaultCamPos.clone()
     const time = this.clock.elapsedTime
     const sin = Math.sin(time)
     const cos = Math.cos(time)
@@ -57,10 +68,6 @@ export default class CApp extends PThree {
     // Camera
     const nowPoint = this.camera.position
     const targetPoint = new THREE.Vector3(0, sin * this.defaultCamDis, cos * this.defaultCamDis)
-
-    // forDebug
-    // const nowPoint = this.mesh02.position
-    // const targetPoint = new THREE.Vector3(0, sin * this.mesh02Dis, cos * this.mesh02Dis)
 
     // ベクトル
     const nowSubVec = new THREE.Vector3().subVectors(nowPoint, new THREE.Vector3(0, 0, 0)).normalize()
@@ -76,11 +83,14 @@ export default class CApp extends PThree {
     // Camera
     this.camera.quaternion.premultiply(qtn)
     this.camera.position.set(targetPoint.x, targetPoint.y, targetPoint.z)
-    console.log(this.camera.position.z)
 
-    // for Debug
-    // this.mesh02.quaternion.premultiply(qtn)
-    // this.mesh02.position.set(targetPoint.x, targetPoint.y, targetPoint.z)
+    if(this.cameraHelper) {
+      this.cameraHelper.update()
+    }
+
+    this._camera.updateProjectionMatrix()
+    this.renderer.render( this.scene, this.camera );
+    this.renderer.render(this.scene, this._camera);
   }
 
   onResize() {

@@ -17,7 +17,7 @@ export default class PThree {
       lookAt: new THREE.Vector3(0.0, 0.0, 0.0),
     },
     render: {
-      clearColor: 0xffffff,
+      clearColor: 0xdddddd,
       width: this.sw,
       height: this.sh,
     },
@@ -97,13 +97,14 @@ export default class PThree {
   parentRender() {
     requestAnimationFrame(() => this.parentRender());
     if (this.controls) this.controls.update();
+    if (this.cameraHelper) this.cameraHelper.update();
 
     this.delta = this.clock.getDelta();
     if (this.mixer && this.delta) this.mixer.update(this.delta);
 
+    
+    this.camera.updateProjectionMatrix()
     if (this.render) this.render();
-
-    this.renderer.render(this.scene, this.camera);
   }
 
   onParentMousemove(e) {
@@ -115,16 +116,22 @@ export default class PThree {
     this.mouse.mapY = this.mouse.y / (this.sh / 2);
     if(this.onMousemove) {
       this.onMousemove(this.mouse)
-      // console.log(this.mouse);
     }
   }
 
-  addControls() {
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+  addControls(camera) {
+    this.controls = new OrbitControls(camera, this.renderer.domElement);
   }
   addAxesHelper(length = 5) {
     this.axesHelper = new THREE.AxesHelper(length);
     this.scene.add(this.axesHelper);
+  }
+  addCameraHelper(camera) {
+    this.cameraHelper = new THREE.CameraHelper(camera)
+    this.cameraHelper.setColors(new THREE.Color(0xff0000), new THREE.Color(0x00ff00), new THREE.Color(0x0000ff), new THREE.Color(0xff00ff), new THREE.Color(0x00ffff))
+    console.log(this.cameraHelper.camera);
+    // this.cameraHelper.setColors(new THREE.Color(255, 0, 0), )
+    this.scene.add(this.cameraHelper)
   }
   loadGltf({ path, aniWeight = [] }) {
     return new Promise((resolve) => {
@@ -152,7 +159,7 @@ export default class PThree {
   }
 }
 
-class LCamera {
+export class LCamera {
   constructor({ param, isFitScreen = false }) {
     this.param = param;
     if (isFitScreen) {
@@ -181,7 +188,7 @@ class LCamera {
 }
 
 
-class LLight {
+export class LLight {
   constructor({ kind, param }) {
     this.kind = kind;
     this.param = param;
