@@ -1,0 +1,17 @@
+{
+  "name": "camera-qtn",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host"
+  },
+  "devDependencies": {
+    "vite": "^2.9.9"
+  },
+  "dependencies": {
+    "sass": "^1.53.0",
+    "three": "^0.142.0"
+  }
+}
