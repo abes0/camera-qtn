@@ -129,7 +129,6 @@ export default class PThree {
   addCameraHelper(camera) {
     this.cameraHelper = new THREE.CameraHelper(camera)
     this.cameraHelper.setColors(new THREE.Color(0xff0000), new THREE.Color(0x00ff00), new THREE.Color(0x0000ff), new THREE.Color(0xff00ff), new THREE.Color(0x00ffff))
-    console.log(this.cameraHelper.camera);
     // this.cameraHelper.setColors(new THREE.Color(255, 0, 0), )
     this.scene.add(this.cameraHelper)
   }

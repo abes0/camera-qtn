@@ -40,8 +40,8 @@ export default class CApp extends PThree {
 
   initMesh(option = {}) {
     const {size, face, pos} = option
-    // const geo = new THREE.BoxGeometry(size, size, size)
-    const geo = new THREE.ConeGeometry(size, size, 32)
+    const geo = new THREE.BoxGeometry(size, size, size)
+    // const geo = new THREE.ConeGeometry(size, size, 32)
     const mat = new THREE.MeshNormalMaterial({
       // color: 0xaabbee,
       // emissive: 0x072534,
@@ -63,11 +63,14 @@ export default class CApp extends PThree {
     const time = this.clock.elapsedTime
     const sin = Math.sin(time)
     const cos = Math.cos(time)
+    const positionVec = new THREE.Vector3(sin, sin, cos)
+    positionVec.normalize()
 
     // 位置
     // Camera
     const nowPoint = this.camera.position
-    const targetPoint = new THREE.Vector3(sin * this.defaultCamDis, sin * this.defaultCamDis, cos * this.defaultCamDis)
+    
+    const targetPoint = new THREE.Vector3(positionVec.x * this.defaultCamDis, positionVec.y * this.defaultCamDis, positionVec.z * this.defaultCamDis)
 
     // ベクトル
     const nowSubVec = new THREE.Vector3().subVectors(nowPoint, new THREE.Vector3(0, 0, 0)).normalize()
@@ -90,7 +93,7 @@ export default class CApp extends PThree {
 
     this._camera.updateProjectionMatrix()
     this.renderer.render( this.scene, this.camera );
-    this.renderer.render(this.scene, this._camera);
+    // this.renderer.render(this.scene, this._camera);
   }
 
   onResize() {
