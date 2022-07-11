@@ -30,7 +30,7 @@ export default class CApp extends PThree {
     this._camera = new LCamera({param: _cameraParam }).get()
 
     // helpers
-    // this.addControls(this.camera)
+    this.addControls(this._camera)
     this.addCameraHelper(this.camera)
 
     this.cameraHelper = new THREE.CameraHelper(this.camera)
@@ -67,7 +67,7 @@ export default class CApp extends PThree {
     // 位置
     // Camera
     const nowPoint = this.camera.position
-    const targetPoint = new THREE.Vector3(0, sin * this.defaultCamDis, cos * this.defaultCamDis)
+    const targetPoint = new THREE.Vector3(sin * this.defaultCamDis, sin * this.defaultCamDis, cos * this.defaultCamDis)
 
     // ベクトル
     const nowSubVec = new THREE.Vector3().subVectors(nowPoint, new THREE.Vector3(0, 0, 0)).normalize()
